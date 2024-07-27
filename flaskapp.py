@@ -119,13 +119,15 @@ def register():
             cities_list = [{"id": city[0], "name": city[1], "state_id": city[2]} for city in cities]
             cursor.execute("SELECT LevelID, LevelName FROM EducationLevels")
             levels = cursor.fetchall()
-
+            cursor.execute("SELECT * FROM positions")
+            positions_list = cursor.fetchall()
+            positions = [{"id": pos[0], "name": pos[1]} for pos in positions_list]
     except Exception as e:
         print(f"Database error: {e}")
         flash("An error occurred while fetching form data.")
         return render_template("registration.html")
 
-    return render_template("registration.html", skills=skills, courses=courses, levels=levels, cities=cities_list, states=states_list)
+    return render_template("registration.html", skills=skills, courses=courses, levels=levels, cities=cities_list, states=states_list, positions=positions)
 
 @app.route("/get_cities")
 def get_cities():

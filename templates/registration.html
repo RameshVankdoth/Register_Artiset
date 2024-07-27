@@ -190,6 +190,15 @@
 
             <div class="row">
                 <div class="col-md-4 mb-3">
+                    <label for="positionApplying" class="form-label">Position Applying<span class="text-danger">*</span></label>
+                    <select class="form-control" id="positionApplying" name="positionApplying" required>
+                        <option value="">Select Position</option>
+                        {% for pos in positions %}
+                        <option value="{{ pos.name }}">{{ pos.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
                     <label for="primarySkill" class="form-label">Primary Skill <span class="text-danger">*</span></label>
                     <select class="form-control" id="primarySkill" name="primarySkill" required>
                         <option value="">Select Skill</option>
@@ -205,18 +214,6 @@
                         {% for skill in skills %}
                         <option value="{{ skill }}">{{ skill }}</option>
                         {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="positionApplying" class="form-label">Position Applying<span class="text-danger">*</span></label>
-                    <select class="form-control" id="positionApplying" name="positionApplying" required>
-                        <option value="">Select Position</option>
-                        <option value="trainee">Intern</option>
-                        <option value="Intern">Trainee</option>
-                        <option value="Fullstack Dev">Fullstack Dev</option>
-                        <option value="Back-end">Back-end</option>
-                        <option value="Front-end">Front-end</option>
-                        <option value="Dev-ops">Dev-ops</option>
                     </select>
                 </div>
             </div>
@@ -284,10 +281,12 @@
                         <label for="prefCity"> Preferred location <span class="text-danger">*</span></label>
                         <select class="form-control" id="prefCity" name="prefCity" required>
                             <option value="">Select City</option>
-                            {% for city in cities | sort(attribute='name') %}
-                            <option value="{{ city.name}}">{{ city.name }}</option>
+                            {% set specific_cities = ['Pune', 'Mumbai', 'Bengaluru'] %}
+                            {% for city in cities if city.name in specific_cities %}
+                            <option value="{{ city.name }}">{{ city.name }}</option>
                             {% endfor %}
                         </select>
+                        
                     </div>
                 </div>
                 <div class="col-md-6 mb-3">
