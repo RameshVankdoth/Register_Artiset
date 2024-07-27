@@ -106,7 +106,7 @@
     </header>
 
     <div class="container form-container">
-        <form id="registrationForm" onsubmit="return validateForm()" enctype="multipart/form-data">
+        <form id="registrationForm" enctype="multipart/form-data" method="POST">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="Fullname" class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -143,10 +143,10 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label for="level" class="form-label">Education Level <span class="text-danger">*</span></label>
-                    <select class="form-control" id="level" name="level" required>
+                    <select class="form-control" id="level" name="level" required><!-- matching "level" or it should be "education level" -->
                         <option value="">Select Education Level</option>
                         {% for level in levels %}
-                        <option value="{{ level.LevelID }}">{{ level.LevelName }}</option>
+                        <option value="{{ level.LevelName }}">{{ level.LevelName }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -166,7 +166,7 @@
                     <select class="form-control" id="Course" name="Course" required>
                         <option value="">Select Course</option>
                         {% for course in courses %}
-                        <option value="{{ course.CourseID }}">{{ course.CourseName }}</option>
+                        <option value="{{ course.CourseName }}">{{ course.CourseName }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -196,8 +196,8 @@
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="positionApplying" class="form-label">Position Applying</label>
-                    <select class="form-control" id="positionApplying" name="positionApplying">
+                    <label for="positionApplying" class="form-label">Position Applying<span class="text-danger">*</span></label>
+                    <select class="form-control" id="positionApplying" name="positionApplying" required>
                         <option value="">Select Position</option>
                         <option value="trainee">Intern</option>
                         <option value="Intern">Trainee</option>
@@ -206,6 +206,17 @@
                         <option value="Front-end">Front-end</option>
                         <option value="Dev-ops">Dev-ops</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="altphone" class="form-label">Altername Phone: <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="altphone" name="altphone" placeholder="Enter Alternate Phone" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="altemail" class="form-label">Alternate Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="altemail" name="altemail" placeholder="Enter Alternate Email" required />
                 </div>
             </div>
 
@@ -234,6 +245,40 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="currState">Current State <span class="text-danger">*</span></label>
+                        <select class="form-control" id="currState" name="currState" required>
+                            <option value="">Select State</option>
+                            {% for state in states %}
+                            <option value="{{ state.id }}">{{ state.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="currCity">Current City <span class="text-danger">*</span></label>
+                        <select class="form-control" id="currCity" name="currCity" required>
+                            <option value="">Select City</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="prefCity"> Preferred location <span class="text-danger">*</span></label>
+                        <select class="form-control" id="prefCity" name="prefCity" required>
+                            <option value="">Select City</option>
+                            {% for city in cities | sort(attribute='name') %}
+                            <option value="{{ city.name}}">{{ city.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
                     <label for="resume" class="form-label">Resume <span class="text-danger">*</span></label>
                     <input type="file" class="form-control-file" id="resume" name="resume" accept=".pdf,.doc,.docx" required />
                 </div>
@@ -249,9 +294,43 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary" onclick="showConfirmation()">Register</button>
             </div>
         </form>
+    </div>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Your Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Full Name:</strong> <span id="confirmFullname"></span></p>
+                    <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
+                    <p><strong>Mobile:</strong> <span id="confirmMobile"></span></p>
+                    <p><strong>Gender:</strong> <span id="confirmGender"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="confirmDob"></span></p>
+                    <p><strong>Education Level:</strong> <span id="confirmLevel"></span></p>
+                    <p><strong>College:</strong> <span id="confirmCollege"></span></p>
+                    <p><strong>Average Marks:</strong> <span id="confirmMarks"></span></p>
+                    <p><strong>Course:</strong> <span id="confirmCourse"></span></p>
+                    <p><strong>Specialization:</strong> <span id="confirmSpecialization"></span></p>
+                    <p><strong>Primary Skill:</strong> <span id="confirmPrimarySkill"></span></p>
+                    <p><strong>Secondary Skill:</strong> <span id="confirmSecondarySkill"></span></p>
+                    <p><strong>Position Applying:</strong> <span id="confirmPositionApplying"></span></p>
+                    <p><strong>Home State:</strong> <span id="confirmHomeState"></span></p>
+                    <p><strong>Home City:</strong> <span id="confirmHomeCity"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeForm()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm()">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="footer">
@@ -272,7 +351,7 @@
         function updateCityDropdown(stateSelectId, citySelectId) {
             var stateId = document.getElementById(stateSelectId).value;
             var citySelect = document.getElementById(citySelectId);
-
+            
             // Clear previous options
             citySelect.innerHTML = '<option value="">Select City</option>';
 
@@ -297,19 +376,125 @@
             updateCityDropdown('homeState', 'homeCity');
         });
 
-    </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var stateSelect = document.getElementById('currState');
+            stateSelect.addEventListener('change', function() {
+                updateCityDropdown('currState',  'currCity');
+            });
 
-        <!-- <script>
-            // Function to log the value of the dropdown
-            function logDropdownValue() {
-                var stateSelect = document.getElementById('homeState');
-                var selectedValue = stateSelect.value;
-                console.log("Selected State ID:", selectedValue);
+            // Trigger the update function on page load if a state is pre-selected
+            updateCityDropdown('currState', 'currCity');
+        });
+
+    </script>
+    <script>
+        function updateCityDropdown(stateSelectId, citySelectId) {
+            const stateSelect = document.getElementById(stateSelectId);
+            const citySelect = document.getElementById(citySelectId);
+            const stateId = stateSelect.value;
+
+            // Clear existing options
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            if (!stateId) {
+                return;
             }
 
-            // Add event listener to the dropdown
-            document.getElementById('homeState').addEventListener('change', logDropdownValue);
-        </script> -->
+            // Fetch cities based on selected state
+            fetch(`/get_cities?state_id=${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.text = city.name;
+                        citySelect.add(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching cities:', error);
+                });
+        }
+
+        function showConfirmation() {
+            const form = document.getElementById('registrationForm');
+            document.getElementById('confirmFullname').textContent = form.Fullname.value;
+            document.getElementById('confirmEmail').textContent = form.email.value;
+            // Set more fields as needed
+            $('#confirmationModal').modal('show');
+        }
+
+        function submitForm() {
+            const form = document.getElementById('registrationForm');
+            form.submit();
+        }
+    </script>
+    <script>
+       function showConfirmation(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get form values
+    const fullname = $('#Fullname').val();
+    const email = $('#email').val();
+    const mobile = $('#mobile').val();
+    const gender = $('#gender').val();
+    const dob = $('#dob').val();
+    const level = $('#level').val();
+    const college = $('#college').val();
+    const marks = $('#marks').val();
+    const course = $('#Course').val();
+    const specialization = $('#Specialization').val();
+    const primarySkill = $('#primarySkill').val();
+    const secondarySkill = $('#secondarySkill').val();
+    const positionApplying = $('#positionApplying').val();
+    const homeState = $('#homeState').val();
+    const homeCity = $('#homeCity').val();
+
+    // Set values in modal
+    $('#confirmFullname').text(fullname);
+    $('#confirmEmail').text(email);
+    $('#confirmMobile').text(mobile);
+    $('#confirmGender').text(gender);
+    $('#confirmDob').text(dob);
+    $('#confirmLevel').text(level);
+    $('#confirmCollege').text(college);
+    $('#confirmMarks').text(marks);
+    $('#confirmCourse').text(course);
+    $('#confirmSpecialization').text(specialization);
+    $('#confirmPrimarySkill').text(primarySkill);
+    $('#confirmSecondarySkill').text(secondarySkill);
+    $('#confirmPositionApplying').text(positionApplying);
+    $('#confirmHomeState').text(homeState);
+    $('#confirmHomeCity').text(homeCity);
+
+    // Show modal
+    $('#confirmationModal').modal('show');
+}
+
+function closeForm() {
+    $('#confirmationModal').modal('hide');
+}
+
+// Function to submit form after confirmation
+function submitForm() {
+    // Hide the modal
+    $('#confirmationModal').modal('hide');
+
+//     // Submit the form via AJAX
+//     const formData = new FormData(document.getElementById('registrationForm'));
+//     fetch('/register', {
+//         method: 'POST',
+//         body: formData
+//     }).then(response => {
+//         if (response.redirected) {
+//             window.location.href = response.url;
+//         }
+//     }).catch(error => {
+//         console.error('Error:', error);
+//     });
+}
+
+    </script>
 
 </body>
 
