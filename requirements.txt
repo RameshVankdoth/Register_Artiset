@@ -3,3 +3,8 @@ requests==2.26.0
 python-dotenv==0.19.2
 pyodbc==4.0.30
 Werkzeug==2.1.0
+pyodbc
+fastapi
+uvicorn[standard]
+pydantic
+azure-identity
