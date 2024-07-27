@@ -8,3 +8,6 @@ fastapi
 uvicorn[standard]
 pydantic
 azure-identity
+gunicorn
+Jinja2==3.2.1
+traceback
