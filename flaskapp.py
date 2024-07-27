@@ -4,28 +4,43 @@ import os
 import traceback
 
 import pyodbc
+import requests
+from dotenv import load_dotenv
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_from_directory, session, url_for)
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__, template_folder="templates")
-app.secret_key = 'your_secret_key_here'  # Ensure this is a strong secret key
+app.secret_key = 'a6d73b93ebd82df2fe65d279231ab7642a'  # Ensure this is a strong secret key
 
 connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=RAMESH\\MSSQLSERVER02;Database=student;Trusted_Connection=yes;"
 
+app.config['UPLOAD_FOLDER'] = 'temp'
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
-with open('credentials.json') as f:
-    creds_info = json.load(f)
-    credentials = service_account.Credentials.from_service_account_info(
-        creds_info,
-        scopes=['https://www.googleapis.com/auth/drive.file']
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+GITHUB_REPO = os.getenv('GITHUB_REPO')
+GITHUB_API_URL = f'https://api.github.com/repos/{GITHUB_REPO}/contents/'
+
+def upload_to_github(filename, file_path):
+    with open(file_path, 'rb') as file:
+        content = file.read()
+    response = requests.put(
+        GITHUB_API_URL + filename,
+        headers={
+            'Authorization': f'token {GITHUB_TOKEN}',
+            'Content-Type': 'application/octet-stream'
+        },
+        json={
+            'message': 'Upload file',
+            'content': content.decode('latin1')  # Encode as base64 string
+        }
     )
-    
-def get_drive_service():
-    return build('drive', 'v3', credentials=credentials)
+    if response.status_code == 201:
+        return response.json()['content']['download_url']
+    else:
+        raise Exception(f"GitHub upload failed: {response.content}")
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -39,20 +54,13 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Upload the file to Google Drive
-        service = get_drive_service()
-        file_metadata = {'name': filename}
-        media = MediaFileUpload(file_path, resumable=True)
-        request = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        )
-        file = request.execute()
-
-        os.remove(file_path)  # Clean up local file
-
-        return f'File uploaded successfully. File ID: {file["id"]}'
+        # Upload file to GitHub
+        try:
+            github_url = upload_to_github(filename, file_path)
+            os.remove(file_path)  # Clean up local file
+            return f'File uploaded successfully. File URL: {github_url}'
+        except Exception as e:
+            return f'Error uploading file: {str(e)}'
 def get_connection():
     return pyodbc.connect(connection_string)
 
