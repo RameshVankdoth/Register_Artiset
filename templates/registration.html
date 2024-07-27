@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .header {
+            background-color: #343a40;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .header img {
+            max-height: 80px;
+        }
+
+        .form-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer .gradient-text {
+            background: linear-gradient(45deg, #f06, #4a90e2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .form-control {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+
+        .form-control-file {
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .pass-check, .text-danger {
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="scroll logo" href="#wrapper">
+                        <img class="logo-default" src="{{ url_for('static', filename='img/logo.png') }}" alt="logo" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container form-container">
+        <form id="registrationForm" onsubmit="return validateForm()" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="Fullname" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Fullname" name="Fullname" placeholder="Enter your full name" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="mobile" class="form-label">Mobile <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="mobile" name="mobile" pattern="\d{10}" maxlength="10" placeholder="Enter 10-digit mobile number" required />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                    <select class="form-control" id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="dob" class="form-label">DOB <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="dob" name="dob" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="level" class="form-label">Education Level <span class="text-danger">*</span></label>
+                    <select class="form-control" id="level" name="level" required>
+                        <option value="">Select Education Level</option>
+                        {% for level in levels %}
+                        <option value="{{ level.LevelID }}">{{ level.LevelName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="college" class="form-label">College <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="college" name="college" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="marks" class="form-label">Avg Marks (CGPA) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="marks" name="marks" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="Course" class="form-label">Course <span class="text-danger">*</span></label>
+                    <select class="form-control" id="Course" name="Course" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.CourseID }}">{{ course.CourseName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="Specialization" class="form-label">Specialization <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="Specialization" name="Specialization" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="primarySkill" class="form-label">Primary Skill <span class="text-danger">*</span></label>
+                    <select class="form-control" id="primarySkill" name="primarySkill" required>
+                        <option value="">Select Skill</option>
+                        {% for skill in skills %}
+                        <option value="{{ skill }}">{{ skill }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="secondarySkill" class="form-label">Secondary Skill <span class="text-danger">*</span></label>
+                    <select class="form-control" id="secondarySkill" name="secondarySkill" required>
+                        <option value="">Select Skill</option>
+                        {% for skill in skills %}
+                        <option value="{{ skill }}">{{ skill }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="positionApplying" class="form-label">Position Applying</label>
+                    <select class="form-control" id="positionApplying" name="positionApplying">
+                        <option value="">Select Position</option>
+                        <option value="trainee">Intern</option>
+                        <option value="Intern">Trainee</option>
+                        <option value="Fullstack Dev">Fullstack Dev</option>
+                        <option value="Back-end">Back-end</option>
+                        <option value="Front-end">Front-end</option>
+                        <option value="Dev-ops">Dev-ops</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="homeState">Home State <span class="text-danger">*</span></label>
+                        <select class="form-control" id="homeState" name="homeState" required>
+                            <option value="">Select State</option>
+                            {% for state in states %}
+                            <option value="{{ state.id }}">{{ state.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="homeCity">Home City <span class="text-danger">*</span></label>
+                        <select class="form-control" id="homeCity" name="homeCity" required>
+                            <option value="">Select City</option>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="resume" class="form-label">Resume <span class="text-danger">*</span></label>
+                    <input type="file" class="form-control-file" id="resume" name="resume" accept=".pdf,.doc,.docx" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="terms" required />
+                    <label class="form-check-label" for="terms">
+                        I accept the <a href="#">terms and conditions</a>.
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="footer">
+        <p class="gradient-text">Artiset Talent Hunt &copy; 2024</p>
+    </footer>
+
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        // Convert Jinja2 cities array to JavaScript array
+        var cities = {{ cities|tojson|safe }};
+        var states = {{ states|tojson|safe }};
+
+        function updateCityDropdown(stateSelectId, citySelectId) {
+            var stateId = document.getElementById(stateSelectId).value;
+            var citySelect = document.getElementById(citySelectId);
+
+            // Clear previous options
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            // Filter and add new options
+            cities.forEach(function(city) {
+                if (city.state_id == stateId) {
+                    var option = document.createElement('option');
+                    option.value = city.id;
+                    option.textContent = city.name;
+                    citySelect.appendChild(option);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var stateSelect = document.getElementById('homeState');
+            stateSelect.addEventListener('change', function() {
+                updateCityDropdown('homeState', 'homeCity');
+            });
+
+            // Trigger the update function on page load if a state is pre-selected
+            updateCityDropdown('homeState', 'homeCity');
+        });
+
+    </script>
+
+        <!-- <script>
+            // Function to log the value of the dropdown
+            function logDropdownValue() {
+                var stateSelect = document.getElementById('homeState');
+                var selectedValue = stateSelect.value;
+                console.log("Selected State ID:", selectedValue);
+            }
+
+            // Add event listener to the dropdown
+            document.getElementById('homeState').addEventListener('change', logDropdownValue);
+        </script> -->
+
+</body>
+
+</html>
