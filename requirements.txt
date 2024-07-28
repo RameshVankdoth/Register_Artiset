@@ -11,3 +11,5 @@ azure-identity
 gunicorn
 Jinja2==3.2.1
 traceback
+gunicorn==20.1.0
+traceback
