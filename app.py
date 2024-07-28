@@ -1,11 +1,7 @@
-import base64
 import datetime
-import json
-import os
 import traceback
 
 import pyodbc
-import requests
 from dotenv import load_dotenv
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_from_directory, session, url_for)
