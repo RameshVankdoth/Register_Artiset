@@ -10,7 +10,6 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__, template_folder="templates")
 app.secret_key = 'a6d73b93ebd82df2fe65d279231ab7642a'  # Ensure this is a strong secret key
 
-# connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=RAMESH\\MSSQLSERVER02;Database=student;Trusted_Connection=yes;"
 connection_string = (
     'Driver={ODBC Driver 17 for SQL Server};Server=tcp:hackathondatabase.database.windows.net,1433;Database=hachathon;Uid=hackathon-admin;Pwd={Pune@2024};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 )
@@ -49,8 +48,6 @@ def register():
             current_city = int(request.form.get("currCity"))
             preferred_location = request.form.get("prefCity")
 
-            print(f"Form Data: Fullname={fullname}, Email={email}, Mobile={mobile}, Gender={gender}, DOB={dob}, EducationLevel={education_level}, College={college}, Marks={marks}, Course={course}, Specialization={specialization}, PrimarySkill={primary_skill}, SecondarySkill={secondary_skill}, PositionApplying={position_applying}, AlternateMobile={alternate_mobile}, AlternateEmail={alternate_email}, HomeState={home_state}, HomeCity={home_city}, CurrentState={current_state}, CurrentCity={current_city}, PreferredLocation={preferred_location}")
-
             # Get current date and time for DOE
             doe = datetime.datetime.now()
 
@@ -75,18 +72,14 @@ def register():
                 
                 cursor.execute("SELECT city_id, city_name, state_id FROM cities")
                 cities = cursor.fetchall()
+                
                 print(fullname, email, mobile, gender, dob, education_level, college, marks, course, specialization, primary_skill, secondary_skill,
-                     position_applying, alternate_mobile, alternate_email, states[home_state-1][1], cities[home_city-2][1], states[current_state-1][1], cities[current_city-2][1], preferred_location, doe)
-                # Check if user already exists
-                cursor.execute(
-                    "SELECT EmailId, Mobile FROM StudentData WHERE EmailId = ? OR Mobile = ?",
-                    (email, mobile),
-                )
-                                    
+                     position_applying, alternate_mobile, alternate_email, states[home_state-1][1], cities[home_city-1][1], states[current_state-1][1], cities[current_city-1][1], preferred_location, doe)
+
                 cursor.execute(
                     "INSERT INTO StudentData (Fullname, EmailId, Mobile, Gender, DOB, EducationLevel, College, Marks, Course, Specialization, PrimarySkill, SecondarySkill, PositionApplying, AlternateMobile, AlternateEmail, HomeState, HomeCity, CurrentState, CurrentCity, PreferredLocation, DOE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (fullname, email, mobile, gender, dob, education_level, college, marks, course, specialization, primary_skill, secondary_skill,
-                     position_applying, alternate_mobile, alternate_email, states[home_state-1][1], cities[home_city-2][1], states[current_state-1][1], cities[current_city-2][1], preferred_location, doe)
+                     position_applying, alternate_mobile, alternate_email, states[home_state-1][1], cities[home_city-1][1], states[current_state-1][1], cities[current_city-1][1], preferred_location, doe)
                 )
                
                 conn.commit()
@@ -128,7 +121,7 @@ def register():
 @app.route("/get_cities")
 def get_cities():
     state_id = request.args.get("state_id", type=int)
-    if state_id is None:
+    if (state_id is None):
         return jsonify({"cities": []})
 
     try:
